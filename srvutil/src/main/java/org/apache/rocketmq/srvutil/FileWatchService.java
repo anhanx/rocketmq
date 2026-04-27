@@ -29,11 +29,11 @@ import java.util.Map;
 import org.apache.rocketmq.common.LifecycleAwareServiceThread;
 import org.apache.rocketmq.common.UtilAll;
 import org.apache.rocketmq.common.constant.LoggerName;
-import org.apache.rocketmq.logging.InternalLogger;
-import org.apache.rocketmq.logging.InternalLoggerFactory;
+import org.apache.rocketmq.logging.org.slf4j.Logger;
+import org.apache.rocketmq.logging.org.slf4j.LoggerFactory;
 
 public class FileWatchService extends LifecycleAwareServiceThread {
-    private static final InternalLogger log = InternalLoggerFactory.getLogger(LoggerName.COMMON_LOGGER_NAME);
+    private static final Logger log = LoggerFactory.getLogger(LoggerName.COMMON_LOGGER_NAME);
 
     private final Map<String, String> currentHash = new HashMap<>();
     private final Listener listener;
@@ -64,7 +64,7 @@ public class FileWatchService extends LifecycleAwareServiceThread {
                 this.waitForRunning(WATCH_INTERVAL);
                 for (Map.Entry<String, String> entry : currentHash.entrySet()) {
                     String newHash = md5Digest(entry.getKey());
-                    if (!newHash.equals(currentHash.get(entry.getKey()))) {
+                    if (!newHash.equals(entry.getValue())) {
                         entry.setValue(newHash);
                         listener.onChanged(entry.getKey());
                     }

@@ -33,10 +33,10 @@ public class StatisticsItemScheduledIncrementPrinter extends StatisticsItemSched
      * last snapshots of all scheduled items
      */
     private final ConcurrentHashMap<String, ConcurrentHashMap<String, StatisticsItem>> lastItemSnapshots
-        = new ConcurrentHashMap<String, ConcurrentHashMap<String, StatisticsItem>>();
+        = new ConcurrentHashMap<>();
 
     private final ConcurrentHashMap<String, ConcurrentHashMap<String, StatisticsItemSampleBrief>> sampleBriefs
-        = new ConcurrentHashMap<String, ConcurrentHashMap<String, StatisticsItemSampleBrief>>();
+        = new ConcurrentHashMap<>();
 
     public StatisticsItemScheduledIncrementPrinter(String name, StatisticsItemPrinter printer,
                                                    ScheduledExecutorService executor, InitialDelay initialDelay,
@@ -65,15 +65,15 @@ public class StatisticsItemScheduledIncrementPrinter extends StatisticsItemSched
                     item.getStatObject());
                 StatisticsItem increment = snapshot.subtract(lastSnapshot);
 
-                Interceptor inteceptor = item.getInterceptor();
-                String inteceptorStr = formatInterceptor(inteceptor);
-                if (inteceptor != null) {
-                    inteceptor.reset();
+                Interceptor interceptor = item.getInterceptor();
+                String interceptorStr = formatInterceptor(interceptor);
+                if (interceptor != null) {
+                    interceptor.reset();
                 }
 
                 StatisticsItemSampleBrief brief = getSampleBrief(item.getStatKind(), item.getStatObject());
                 if (brief != null && (!increment.allZeros() || printZeroLine())) {
-                    printer.print(name, increment, inteceptorStr, brief.toString());
+                    printer.print(name, increment, interceptorStr, brief.toString());
                 }
 
                 setItemSnapshot(lastItemSnapshots, snapshot);
@@ -85,7 +85,7 @@ public class StatisticsItemScheduledIncrementPrinter extends StatisticsItemSched
         }, getInitialDelay(), interval, TimeUnit.MILLISECONDS);
         addFuture(item, future);
 
-        // sample every TPS_INTREVAL
+        // sample every TPS_INTERVAL
         ScheduledFuture futureSample = executor.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
@@ -140,7 +140,7 @@ public class StatisticsItemScheduledIncrementPrinter extends StatisticsItemSched
         String key = item.getStatObject();
         ConcurrentHashMap<String, StatisticsItem> itemMap = snapshots.get(kind);
         if (itemMap == null) {
-            itemMap = new ConcurrentHashMap<String, StatisticsItem>();
+            itemMap = new ConcurrentHashMap<>();
             ConcurrentHashMap<String, StatisticsItem> oldItemMap = snapshots.putIfAbsent(kind, itemMap);
             if (oldItemMap != null) {
                 itemMap = oldItemMap;
@@ -154,7 +154,7 @@ public class StatisticsItemScheduledIncrementPrinter extends StatisticsItemSched
                                     StatisticsItemSampleBrief brief) {
         ConcurrentHashMap<String, StatisticsItemSampleBrief> itemMap = sampleBriefs.get(kind);
         if (itemMap == null) {
-            itemMap = new ConcurrentHashMap<String, StatisticsItemSampleBrief>();
+            itemMap = new ConcurrentHashMap<>();
             ConcurrentHashMap<String, StatisticsItemSampleBrief> oldItemMap = sampleBriefs.putIfAbsent(kind, itemMap);
             if (oldItemMap != null) {
                 itemMap = oldItemMap;
